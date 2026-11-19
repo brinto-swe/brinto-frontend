@@ -1,19 +1,40 @@
-import { Button } from "@/components/ui/button"
+import type { Metadata } from "next"
+import { Footer } from "@/components/layout/footer"
+import { Navbar } from "@/components/layout/navbar"
+import { AboutSection } from "@/components/sections/about-section"
+import { CertificationsSection } from "@/components/sections/certifications-section"
+import { ContactSection } from "@/components/sections/contact-section"
+import { EducationSection } from "@/components/sections/education-section"
+import { HeroSection } from "@/components/sections/hero-section"
+import { ProjectsSection } from "@/components/sections/projects-section"
+import { SkillsSection } from "@/components/sections/skills-section"
+import { ScrollReveal } from "@/components/shared/scroll-reveal"
+import "./portfolio.css"
+
+export const metadata: Metadata = {
+  title: "Brinto.dev | K M Mozaddedul Islam",
+  description:
+    "Portfolio of K M Mozaddedul Islam (Brinto), a software engineer, AI researcher, and full-stack developer.",
+}
 
 export default function Page() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
+    <div className="portfolio">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <Navbar />
+      <main id="main-content" tabIndex={-1}>
+        <HeroSection />
+        <AboutSection />
+        <EducationSection />
+        <SkillsSection />
+        <ProjectsSection />
+        <CertificationsSection />
+        <ContactSection />
+      </main>
+      <Footer />
+      <ScrollReveal />
     </div>
   )
 }
