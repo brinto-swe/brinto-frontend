@@ -46,7 +46,7 @@ export const navigation = [
   { label: "Certifications", href: "#certifications" },
   { label: "Blogs", href: "/blogs" },
   { label: "Contact", href: "#contact" },
-]
+] as const
 
 export const socialProfiles: { label: string; url?: string }[] = [
   { label: "GitHub" },

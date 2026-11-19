@@ -77,7 +77,7 @@ export function ProjectsSection() {
           title="Featured"
           accent="Projects"
           icon={HiOutlineRectangleStack}
-          description="A selection of web applications, AI projects, and full-stack work."
+          description="A selection of web applications, AI projects, and full-stack work. Thumbnails show interface mockups."
         />
         <div
           className="project-filters"
@@ -130,8 +130,11 @@ export function ProjectsSection() {
                       width={width}
                       height={height}
                       alt=""
-                      unoptimized={Boolean(crop)}
-                      sizes="(max-width: 680px) 92vw, (max-width: 900px) 45vw, 31vw"
+                      sizes={
+                        crop
+                          ? "1360px"
+                          : "(max-width: 680px) 92vw, (max-width: 900px) 45vw, 31vw"
+                      }
                       style={
                         crop
                           ? {

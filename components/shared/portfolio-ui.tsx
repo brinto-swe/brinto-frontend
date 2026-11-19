@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa6"
 import { HiOutlineCodeBracket, HiOutlineGlobeAlt } from "react-icons/hi2"
 import { socialProfiles } from "@/data/portfolio"
+import type { Language } from "@/data/blog/schema"
 
 const socialIcons: Record<string, IconType> = {
   GitHub: FaGithub,
@@ -19,23 +20,29 @@ const socialIcons: Record<string, IconType> = {
 
 export function Brand({
   footer = false,
+  href = "#home",
+  fullName = footer,
+  label = "Brinto.dev home",
   onClick,
 }: {
   footer?: boolean
+  href?: string
+  fullName?: boolean
+  label?: string
   onClick?: () => void
 }) {
   return (
     <a
       className="portfolio-brand"
-      href="#home"
-      aria-label="Brinto.dev home"
+      href={href}
+      aria-label={label}
       onClick={onClick}
     >
       <span className="brand-mark">
         <HiOutlineCodeBracket aria-hidden="true" />
       </span>
       <span>
-        Brinto<span className="brand-accent">{footer ? ".dev" : "."}</span>
+        Brinto<span className="brand-accent">{fullName ? ".dev" : "."}</span>
       </span>
     </a>
   )
@@ -72,11 +79,20 @@ export function SectionHeading({
   )
 }
 
-export function SocialLinks() {
+export function SocialLinks({ language = "en" }: { language?: Language }) {
   return (
-    <ul className="social-links" aria-label="Social profiles">
+    <ul
+      className="social-links"
+      aria-label={
+        language === "bn" ? "সামাজিক যোগাযোগের প্রোফাইল" : "Social profiles"
+      }
+    >
       {socialProfiles.map(({ label, url }) => {
         const Icon = socialIcons[label] ?? HiOutlineGlobeAlt
+        const placeholder =
+          language === "bn"
+            ? `${label} প্রোফাইল শিগগিরই আসবে`
+            : `${label} profile coming soon`
         return (
           <li key={label}>
             {url ? (
@@ -84,9 +100,9 @@ export function SocialLinks() {
                 <Icon aria-hidden="true" />
               </a>
             ) : (
-              <span aria-disabled="true" title={`${label} profile coming soon`}>
+              <span aria-disabled="true" title={placeholder}>
                 <Icon aria-hidden="true" />
-                <span className="sr-only">{label} profile coming soon</span>
+                <span className="sr-only">{placeholder}</span>
               </span>
             )}
           </li>

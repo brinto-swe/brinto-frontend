@@ -4,13 +4,17 @@ import { useEffect, useRef, useState } from "react"
 import { HiOutlineBars3, HiOutlineUser, HiOutlineXMark } from "react-icons/hi2"
 import { Brand } from "@/components/shared/portfolio-ui"
 import { navigation } from "@/data/portfolio"
+import { banglaNavigation } from "@/data/blog/copy"
+import type { Language } from "@/data/blog/schema"
 
-export function Navbar() {
+export function Navbar({ blogLanguage }: { blogLanguage?: Language }) {
   const [active, setActive] = useState("#home")
   const [open, setOpen] = useState(false)
   const toggle = useRef<HTMLButtonElement>(null)
+  const bangla = blogLanguage === "bn"
 
   useEffect(() => {
+    if (blogLanguage) return
     const sections = navigation.flatMap(({ href }) => {
       const section = href.startsWith("#")
         ? document.getElementById(href.slice(1))
@@ -33,13 +37,13 @@ export function Navbar() {
       window.removeEventListener("scroll", updateActive)
       window.removeEventListener("resize", updateActive)
     }
-  }, [])
+  }, [blogLanguage])
 
   return (
     <header className="portfolio-header">
       <nav
         className="portfolio-nav portfolio-container"
-        aria-label="Main navigation"
+        aria-label={bangla ? "প্রধান নেভিগেশন" : "Main navigation"}
         onKeyDown={(event) => {
           if (event.key === "Escape" && open) {
             setOpen(false)
@@ -47,12 +51,25 @@ export function Navbar() {
           }
         }}
       >
-        <Brand onClick={() => setOpen(false)} />
+        <Brand
+          href={blogLanguage ? "/#home" : undefined}
+          fullName={Boolean(blogLanguage)}
+          label={bangla ? "Brinto.dev হোম" : undefined}
+          onClick={() => setOpen(false)}
+        />
         <button
           ref={toggle}
           type="button"
           className="menu-toggle"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={
+            bangla
+              ? open
+                ? "মেনু বন্ধ করুন"
+                : "মেনু খুলুন"
+              : open
+                ? "Close menu"
+                : "Open menu"
+          }
           aria-controls="portfolio-navigation"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
@@ -72,24 +89,34 @@ export function Navbar() {
             {navigation.map(({ label, href }) => (
               <li key={href}>
                 <a
-                  href={href}
-                  aria-current={active === href ? "location" : undefined}
+                  href={
+                    blogLanguage && href.startsWith("#") ? `/${href}` : href
+                  }
+                  aria-current={
+                    blogLanguage
+                      ? href === "/blogs"
+                        ? "page"
+                        : undefined
+                      : active === href
+                        ? "location"
+                        : undefined
+                  }
                   onClick={() => {
                     if (href.startsWith("#")) setActive(href)
                     setOpen(false)
                   }}
                 >
-                  {label}
+                  {bangla ? banglaNavigation[label] : label}
                 </a>
               </li>
             ))}
           </ul>
           <a
-            className="portfolio-button portfolio-button--outline login-link"
             href="/login"
+            className="portfolio-button portfolio-button--outline login-link"
             onClick={() => setOpen(false)}
           >
-            <HiOutlineUser aria-hidden="true" /> Login
+            <HiOutlineUser aria-hidden="true" /> {bangla ? "লগইন" : "Login"}
           </a>
         </div>
       </nav>

@@ -21,7 +21,7 @@ export function HeroSection() {
             </p>
           )}
           <h1 id="hero-title">
-            <span className="hero-intro">Hi, I’m</span>
+            <span className="hero-intro">Hi, I’m</span>{" "}
             <span className="hero-name">
               {profile.name} <small>({profile.nickname})</small>
             </span>
@@ -88,7 +88,7 @@ export function HeroSection() {
             ))}
           </dl>
         </div>
-        <div className="portrait-stage">
+        <div className="portrait-stage" data-view-motion>
           <input
             className="portrait-pause sr-only"
             type="checkbox"
@@ -117,6 +117,8 @@ export function HeroSection() {
                   height={height}
                   alt=""
                   preload={index === 0}
+                  loading={index === 0 ? undefined : "eager"}
+                  fetchPriority={index === 0 ? undefined : "low"}
                   sizes="(max-width: 680px) 750px, (max-width: 1000px) 900px, 1150px"
                 />
               </div>

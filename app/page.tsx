@@ -8,7 +8,7 @@ import { EducationSection } from "@/components/sections/education-section"
 import { HeroSection } from "@/components/sections/hero-section"
 import { ProjectsSection } from "@/components/sections/projects-section"
 import { SkillsSection } from "@/components/sections/skills-section"
-import { ScrollReveal } from "@/components/shared/scroll-reveal"
+import { PortfolioMotion } from "@/components/shared/portfolio-motion"
 import "./portfolio.css"
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function Page() {
         <ContactSection />
       </main>
       <Footer />
-      <ScrollReveal />
+      <PortfolioMotion />
     </div>
   )
 }
