@@ -1,17 +1,28 @@
 import { profile, researchAreas } from "@/data/portfolio"
+import { blogPosts } from "@/data/blog/posts"
+import type { ArticleBlock, BlogPost, Category } from "@/data/blog/schema"
+import type { UploadedImage } from "./image-uploader"
+import { legacyArticle } from "./blog-editor-model"
 
 export type BlogStatus = "Draft" | "Published" | "Archived"
-type Language = { title: string; excerpt: string; article: string }
+export type BlogTranslation = {
+  title: string
+  excerpt: string
+  tags: string[]
+  content: ArticleBlock[]
+  imageAssets?: UploadedImage[]
+}
 export type Blog = {
   id: string
   cover: string
+  coverSprite?: NonNullable<BlogPost["cover"]>
+  coverAsset?: UploadedImage
   category: string
   author: string
   date: string
-  tags: string
   status: BlogStatus
-  en: Language
-  bn: Language
+  en: BlogTranslation
+  bn: BlogTranslation
 }
 export type RecordData = { id: string; values: Record<string, string> }
 export type Collection = "projects" | "education" | "skills" | "certifications"
@@ -41,18 +52,17 @@ export type Activity = {
     | "certifications"
     | "messages"
     | "profile"
-    | "settings"
     | "education"
     | "skills"
     | "resume"
 }
 export type AdminData = {
   blogs: Blog[]
+  blogSchemaVersion: 1
   records: Record<Collection, RecordData[]>
   skillCategories: string[]
   messages: Message[]
   profile: Record<string, string>
-  settings: Record<string, string>
   documents: Record<DocumentKind, DocumentData | null>
   activities: Activity[]
   unreadActivities: boolean
@@ -67,22 +77,42 @@ export const blogCategories = [
   "Tutorials",
 ]
 export const blogStatuses: BlogStatus[] = ["Draft", "Published", "Archived"]
+
+const demoCategories: Record<Category, string> = {
+  ai: "AI",
+  ml: "Machine Learning",
+  neuro: "AI",
+  agriculture: "Research",
+  web: "Web Development",
+  engineering: "Web Development",
+  research: "Research",
+  tutorial: "Tutorials",
+}
+
+export const publicBlogDemos: Blog[] = blogPosts.map((post) => {
+  const translation = (language: "en" | "bn"): BlogTranslation => ({
+    title: post.title[language],
+    excerpt: post.excerpt[language],
+    tags: post.tags[language],
+    content: post.content[language],
+  })
+  return {
+    id: post.id,
+    author: "Brinto",
+    category: demoCategories[post.categories[0]],
+    status: "Published",
+    cover: "",
+    coverSprite: post.cover,
+    date: post.date,
+    en: translation("en"),
+    bn: translation("bn"),
+  }
+})
 export const projectCategories = [
   "Web Development",
   "AI / ML",
   "Full-Stack",
   "Academic",
-]
-export const homepageSections = [
-  "Hero",
-  "About",
-  "Education",
-  "Skills",
-  "Projects",
-  "Certifications",
-  "Blogs",
-  "Contact",
-  "Footer",
 ]
 export const today = () => new Date().toISOString().slice(0, 10)
 export const formatDate = (value: string) =>
@@ -261,26 +291,36 @@ function samplePdf(title: string): DocumentData {
 }
 
 export const seed: AdminData = {
-  blogs: sampleBlogs.map(([title, bn, category, status, excerpt], index) => ({
-    id: `article-${index + 1}`,
-    author: "Brinto",
-    category,
-    status,
-    cover: "/blog/desk.webp",
-    date: `2026-11-${String(16 - index).padStart(2, "0")}`,
-    tags: category,
-    en: {
-      title,
-      excerpt,
-      article: `## Overview\n\n${excerpt}\n\n> An example article for the admin workspace.\n\n- Start with a concrete question\n- Record and compare the results`,
-    },
-    bn: {
-      title: bn,
-      excerpt: "অ্যাডমিন ড্যাশবোর্ডের জন্য একটি নমুনা নিবন্ধ।",
-      article:
-        "## সংক্ষিপ্ত বিবরণ\n\nএই লেখাটি বাংলা সম্পাদক পরীক্ষা করার জন্য একটি নমুনা।",
-    },
-  })),
+  blogSchemaVersion: 1,
+  blogs: [
+    ...sampleBlogs.map(
+      ([title, bn, category, status, excerpt], index): Blog => ({
+        id: `article-${index + 1}`,
+        author: "Brinto",
+        category,
+        status,
+        cover: "/blog/desk.webp",
+        date: `2026-11-${String(16 - index).padStart(2, "0")}`,
+        en: {
+          title,
+          excerpt,
+          tags: [category],
+          content: legacyArticle(
+            `## Overview\n\n${excerpt}\n\n> An example article for the admin workspace.\n\n- Start with a concrete question\n- Record and compare the results`
+          ),
+        },
+        bn: {
+          title: bn,
+          excerpt: "অ্যাডমিন ড্যাশবোর্ডের জন্য একটি নমুনা নিবন্ধ।",
+          tags: [category],
+          content: legacyArticle(
+            "## সংক্ষিপ্ত বিবরণ\n\nএই লেখাটি বাংলা সম্পাদক পরীক্ষা করার জন্য একটি নমুনা।"
+          ),
+        },
+      })
+    ),
+    ...publicBlogDemos,
+  ],
   records,
   skillCategories: [
     "Frontend Development",
@@ -328,17 +368,6 @@ export const seed: AdminData = {
     bio: "I build web applications and research practical uses of artificial intelligence.",
     research: researchAreas.join(", "),
     email: "",
-  },
-  settings: {
-    title: "Brinto.dev",
-    description: "Portfolio and research notes by Brinto.",
-    seoTitle: "Brinto.dev | Software Engineer & AI Researcher",
-    seoDescription:
-      "Explore Brinto’s software projects, technical writing, and research.",
-    language: "English",
-    comments: "true",
-    likes: "true",
-    ...Object.fromEntries(homepageSections.map((section) => [section, "true"])),
   },
   documents: { resume: samplePdf("Resume"), cv: samplePdf("CV") },
   activities: [

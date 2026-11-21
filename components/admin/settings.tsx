@@ -16,7 +16,6 @@ import { buttonVariants } from "@/components/ui/button"
 import { toast } from "sonner"
 import {
   formatDate,
-  homepageSections,
   today,
   type DocumentKind,
   type Message,
@@ -496,92 +495,17 @@ const profileGroups: { title: string; description: string; fields: Field[] }[] =
       fields: socials,
     },
   ]
-const siteGroups: typeof profileGroups = [
-  {
-    title: "General",
-    description: "Set the website name and description.",
-    fields: [
-      { key: "title", label: "Website title", required: true },
-      {
-        key: "description",
-        label: "Website description",
-        type: "textarea",
-        wide: true,
-      },
-    ],
-  },
-  {
-    title: "Search metadata",
-    description: "Edit the default title, description, and social image.",
-    fields: [
-      { key: "seoTitle", label: "SEO title", wide: true },
-      {
-        key: "seoDescription",
-        label: "SEO description",
-        type: "textarea",
-        wide: true,
-      },
-      {
-        key: "seoImage",
-        label: "Social preview image URL",
-        type: "url",
-        wide: true,
-      },
-    ],
-  },
-  {
-    title: "Social media",
-    description: "Manage links associated with the website.",
-    fields: socials,
-  },
-  {
-    title: "Public contact",
-    description: "Set the contact information intended for visitors.",
-    fields: [
-      { key: "email", label: "Public contact email", type: "email" },
-      { key: "location", label: "Public location" },
-    ],
-  },
-  {
-    title: "Homepage visibility",
-    description: "Choose which sections to include in the demo configuration.",
-    fields: homepageSections.map((section) => ({
-      key: section,
-      label: section,
-      type: "switch",
-    })),
-  },
-  {
-    title: "Blog preferences",
-    description: "Set the default language and interaction preferences.",
-    fields: [
-      {
-        key: "language",
-        label: "Default language",
-        type: "select",
-        options: ["English", "বাংলা"],
-        wide: true,
-      },
-      { key: "comments", label: "Allow comments", type: "switch" },
-      { key: "likes", label: "Allow likes", type: "switch" },
-    ],
-  },
-]
-
-export function SettingsForm({ section }: { section: "profile" | "settings" }) {
-  const state = useAdmin()
+export function ProfileSettingsForm() {
+  const { profile } = useAdmin()
   const [draft, setDraft] = useState<Record<string, string> | null>(null)
-  const values = draft ?? state[section]
-  const profile = section === "profile"
-  const groups = profile ? profileGroups : siteGroups
-  const title = profile ? "Profile Settings" : "Site Settings"
+  const values = draft ?? profile
 
   function submit(event: FormEvent) {
     event.preventDefault()
     const cleaned = Object.fromEntries(
       Object.entries(values).map(([key, value]) => [key, value.trim()])
     )
-    const fields = groups.flatMap((group) => group.fields)
+    const fields = profileGroups.flatMap((group) => group.fields)
     if (fields.some((field) => field.required && !cleaned[field.key])) {
       toast.error("Fill in all required fields.")
       return
@@ -599,12 +523,12 @@ export function SettingsForm({ section }: { section: "profile" | "settings" }) {
     }
     if (
       saveDemo(
-        (data) => ({ ...data, [section]: cleaned }),
+        (data) => ({ ...data, profile: cleaned }),
         "Settings saved in this browser",
         {
-          title: `Updated ${profile ? "profile" : "site"} settings`,
+          title: "Updated profile settings",
           detail: "Browser workspace",
-          section,
+          section: "profile",
         }
       )
     )
@@ -614,25 +538,21 @@ export function SettingsForm({ section }: { section: "profile" | "settings" }) {
   return (
     <div className="admin-stack">
       <Heading
-        title={title}
-        description={
-          profile
-            ? "Edit your bio, contact details, and professional links."
-            : "Configure demo site metadata, visibility, and blog preferences."
-        }
+        title="Profile Settings"
+        description="Edit your bio, contact details, and professional links."
       />
       <div className="admin-demo-notice">
         These settings apply to the demo workspace in this browser.
       </div>
       <form className="admin-stack" onSubmit={submit}>
-        {groups.map(({ title, description, fields }, index) => (
+        {profileGroups.map(({ title, description, fields }, index) => (
           <section className="admin-card admin-form-card" key={title}>
             <div className="admin-card-heading">
               <div>
                 <h2>{title}</h2>
                 <p>{description}</p>
               </div>
-              {profile && index === 0 && <Thumbnail src={values.photo} />}
+              {index === 0 && <Thumbnail src={values.photo} />}
             </div>
             <Fields
               fields={fields}

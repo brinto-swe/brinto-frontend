@@ -1,16 +1,9 @@
 import type { Metadata } from "next"
-import { Noto_Sans_Bengali } from "next/font/google"
 import { BlogFeed } from "@/components/blog/blog-feed"
+import { blogBengali } from "@/lib/blog-font"
 import "../portfolio.css"
 import "./blogs.css"
-
-const bengali = Noto_Sans_Bengali({
-  subsets: ["bengali"],
-  weight: "variable",
-  variable: "--font-blog-bengali",
-  display: "swap",
-  preload: false,
-})
+import "./article-prose.css"
 
 export const metadata: Metadata = {
   title: "Insights & Articles | Brinto.dev",
@@ -19,5 +12,5 @@ export const metadata: Metadata = {
 }
 
 export default function BlogsPage() {
-  return <BlogFeed fontClass={bengali.variable} />
+  return <BlogFeed fontClass={blogBengali.variable} />
 }

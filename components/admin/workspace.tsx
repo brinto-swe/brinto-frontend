@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { type Section } from "./routes"
 import { Blogs, Editor } from "./blogs"
 import { CollectionManager } from "./collections"
-import { Documents, Messages, SettingsForm } from "./settings"
+import { Documents, Messages, ProfileSettingsForm } from "./settings"
 
 const Dashboard = dynamic(
   () => import("./dashboard").then((module) => module.Dashboard),
@@ -46,8 +46,7 @@ export function Workspace({
     case "resume":
       return <Documents />
     case "profile":
-    case "settings":
-      return <SettingsForm section={section} />
+      return <ProfileSettingsForm />
     default:
       return (
         <CollectionManager collection={section} find={find} create={create} />

@@ -17,15 +17,58 @@ export const categories = {
 
 export type Category = keyof typeof categories
 
+export const inlineColors = {
+  blue: "#174b92",
+  teal: "#006358",
+  purple: "#663399",
+  red: "#a12638",
+} as const
+
+export type InlineMark = "bold" | "italic" | "underline" | "code"
+
+export const maxArticleListDepth = 4
+
+export function safeArticleHref(href: string) {
+  if (
+    typeof href !== "string" ||
+    href.length > 2048 ||
+    /[\s\\\u0000-\u001f\u007f]/u.test(href)
+  )
+    return undefined
+  if (/^\/(?!\/)|^#[a-z\d-]+$/i.test(href)) return href
+  if (!/^https:\/\/[^/]/i.test(href)) return undefined
+  try {
+    const url = new URL(href)
+    if (url.hostname && !url.username && !url.password) return href
+  } catch {
+    return undefined
+  }
+}
+
+export type InlineSpan = {
+  kind: "span"
+  text: string
+  marks?: InlineMark[]
+  color?: keyof typeof inlineColors
+  href?: string
+}
+
 export type Inline =
   | string
   | { kind: "strong" | "emphasis" | "code"; text: string }
   | { kind: "link"; text: string; href: string }
+  | InlineSpan
+
+export type ArticleList = {
+  kind: "list"
+  ordered: boolean
+  items: (Inline[] | { text: Inline[]; children: ArticleList[] })[]
+}
 
 export type ArticleBlock =
-  | { kind: "heading"; level: 2 | 3; text: string }
+  | { kind: "heading"; level: 2 | 3; text: string | Inline[] }
   | { kind: "paragraph" | "quote"; text: Inline[] }
-  | { kind: "list"; ordered: boolean; items: Inline[][] }
+  | ArticleList
   | { kind: "code"; language: string; code: string; caption: string }
   | {
       kind: "image"
@@ -70,12 +113,23 @@ export const list = (items: string[], ordered = false): ArticleBlock => ({
 export function searchableBlock(block: ArticleBlock): string {
   switch (block.kind) {
     case "heading":
-      return block.text
+      return typeof block.text === "string"
+        ? block.text
+        : inlineText(block.text)
     case "paragraph":
     case "quote":
       return inlineText(block.text)
     case "list":
-      return block.items.map(inlineText).join(" ")
+      return block.items
+        .map((item) =>
+          Array.isArray(item)
+            ? inlineText(item)
+            : [
+                inlineText(item.text),
+                ...item.children.map(searchableBlock),
+              ].join(" ")
+        )
+        .join(" ")
     case "code":
       return `${block.language} ${block.caption} ${block.code}`
     case "image":
@@ -83,7 +137,7 @@ export function searchableBlock(block: ArticleBlock): string {
   }
 }
 
-function inlineText(parts: Inline[]) {
+export function inlineText(parts: Inline[]) {
   return parts
     .map((part) => (typeof part === "string" ? part : part.text))
     .join("")

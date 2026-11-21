@@ -8,7 +8,6 @@ import {
   FileText,
   Mail,
   UserRound,
-  Settings,
 } from "lucide-react"
 
 export const routes = [
@@ -49,12 +48,6 @@ export const routes = [
     segment: "profile",
     label: "Profile Settings",
     icon: UserRound,
-    group: "Configuration",
-  },
-  {
-    segment: "settings",
-    label: "Site Settings",
-    icon: Settings,
     group: "Configuration",
   },
 ] as const

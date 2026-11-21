@@ -3,6 +3,7 @@ import { AdminShell } from "@/components/admin/shell"
 import { requireOwnerSession } from "@/lib/owner-session"
 import { AdminAccessMessage } from "./access-message"
 import "./admin.css"
+import "../blogs/article-prose.css"
 
 export const metadata: Metadata = {
   title: "Admin workspace | Brinto.dev",
